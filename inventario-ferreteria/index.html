@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Inventario - Ferretería</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .content {
+            background: white;
+            border-radius: 0 10px 10px 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .stock-low {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .stock-medium {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .stock-high {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Sistema de Control de Inventario - Ferretería</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('agregar')">➕ Agregar Producto</button>
+            <button class="tab" onclick="showTab('lista')">📋 Lista de Productos</button>
+            <button class="tab" onclick="showTab('inventario')">📊 Control de Inventario</button>
+        </div>
+
+        <!-- TAB 1: AGREGAR PRODUCTO -->
+        <div id="agregar" class="content active">
+            <h2 style="margin-bottom: 20px; color: #333;">Agregar Nuevo Producto</h2>
+            <div id="alert-container"></div>
+            <form id="productForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="codigo">Código del Producto *</label>
+                        <input type="text" id="codigo" required placeholder="Ej: FER-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="nombre">Nombre del Producto *</label>
+                        <input type="text" id="nombre" required placeholder="Ej: Martillo">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoria">Categoría *</label>
+                        <select id="categoria" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Herramientas">Herramientas</option>
+                            <option value="Electricidad">Electricidad</option>
+                            <option value="Plomería">Plomería</option>
+                            <option value="Pintura">Pintura</option>
+                            <option value="Ferretería General">Ferretería General</option>
+                            <option value="Construcción">Construcción</option>
+                            <option value="Jardinería">Jardinería</option>
+                            <option value="Seguridad">Seguridad</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="unidad">Unidad de Medida *</label>
+                        <select id="unidad" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="Pieza">Pieza</option>
+                            <option value="Caja">Caja</option>
+                            <option value="Paquete">Paquete</option>
+                            <option value="Metro">Metro</option>
+                            <option value="Kilo">Kilo</option>
+                            <option value="Litro">Litro</option>
+                            <option value="Galón">Galón</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad Inicial *</label>
+                        <input type="number" id="cantidad" required min="0" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="minimo">Stock Mínimo *</label>
+                        <input type="number" id="minimo" required min="0" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precio">Precio de Compra ($) *</label>
+                        <input type="number" id="precio" required min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="precioVenta">Precio de Venta ($) *</label>
+                        <input type="number" id="precioVenta" required min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="proveedor">Proveedor</label>
+                    <input type="text" id="proveedor" placeholder="Nombre del proveedor">
+                </div>
+
+                <div class="form-group">
+                    <label for="ubicacion">Ubicación en Bodega</label>
+                    <input type="text" id="ubicacion" placeholder="Ej: Pasillo A, Estante 3">
+                </div>
+
+                <div class="form-group">
+                    <label for="notas">Notas / Observaciones</label>
+                    <textarea id="notas" rows="3" placeholder="Información adicional del producto"></textarea>
+                </div>
+
+                <button type="submit" class="btn-success">✓ Agregar Producto</button>
+            </form>
+        </div>
+
+        <!-- TAB 2: LISTA DE PRODUCTOS -->
+        <div id="lista" class="content">
+            <h2 style="margin-bottom: 20px; color: #333;">Lista Completa de Productos</h2>
+            
+            <div class="export-buttons">
+                <button onclick="exportToExcel()">📥 Exportar a Excel</button>
+                <button onclick="printList()">🖨️ Imprimir Lista</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchProducts" placeholder="🔍 Buscar productos..." onkeyup="filterProducts()">
+            </div>
+
+            <div class="table-container">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Cantidad</th>
+                            <th>Unidad</th>
+                            <th>Precio Compra</th>
+                            <th>Precio Venta</th>
+                            <th>Proveedor</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <tr>
+                            <td colspan="10" style="text-align: center; color: #999;">No hay productos registrados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: CONTROL DE INVENTARIO -->
+        <div id="inventario" class="content">
+            <h2 style="margin-bottom: 20px; color: #333;">Control de Inventario</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total de Productos</div>
+                    <div class="stat-value" id="totalProducts">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Valor Total Inventario</div>
+                    <div class="stat-value" id="totalValue">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Productos con Stock Bajo</div>
+                    <div class="stat-value" id="lowStock">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Categorías</div>
+                    <div class="stat-value" id="totalCategories">0</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px 0; color: #333;">Movimientos de Inventario</h3>
+            
+            <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-group">
+                    <label for="movProducto">Producto</label>
+                    <select id="movProducto">
+                        <option value="">Seleccionar producto...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="movTipo">Tipo de Movimiento</label>
+                    <select id="movTipo">
+                        <option value="entrada">Entrada</option>
+                        <option value="salida">Salida</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="movCantidad">Cantidad</label>
+                    <input type="number" id="movCantidad" min="1" placeholder="0">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button onclick="registrarMovimiento()">Registrar Movimiento</button>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInventory" placeholder="🔍 Buscar en inventario..." onkeyup="filterInventory()">
+            </div>
+
+            <div class="table-container">
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Cantidad Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Estado</th>
+                            <th>Valor Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: #999;">No hay productos en inventario</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+        
+        // Cargar datos guardados
+        function loadData() {
+            const saved = window.localStorage ? localStorage.getItem('ferreteriaInventory') : null;
+            if (saved) {
+                try {
+                    products = JSON.parse(saved);
+                } catch(e) {
+                    products = [];
+                }
+            }
+            updateAllViews();
+        }
+
+        // Guardar datos (solo en memoria si localStorage no está disponible)
+        function saveData() {
+            if (window.localStorage) {
+                try {
+                    localStorage.setItem('ferreteriaInventory', JSON.stringify(products));
+                } catch(e) {
+                    console.log('No se pudo guardar en localStorage');
+                }
+            }
+        }
+
+        // Cambiar tabs
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'inventario') {
+                updateInventoryView();
+                updateMovProductos();
+            } else if (tabName === 'lista') {
+                updateProductsList();
+            }
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 3000);
+        }
+
+        // Agregar producto
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const codigo = document.getElementById('codigo').value;
+            
+            // Verificar si el código ya existe
+            if (products.find(p => p.codigo === codigo)) {
+                showAlert('El código del producto ya existe', 'danger');
+                return;
+            }
+
+            const product = {
+                codigo: codigo,
+                nombre: document.getElementById('nombre').value,
+                categoria: document.getElementById('categoria').value,
+                unidad: document.getElementById('unidad').value,
+                cantidad: parseInt(document.getElementById('cantidad').value),
+                minimo: parseInt(document.getElementById('minimo').value),
+                precio: parseFloat(document.getElementById('precio').value),
+                precioVenta: parseFloat(document.getElementById('precioVenta').value),
+                proveedor: document.getElementById('proveedor').value,
+                ubicacion: document.getElementById('ubicacion').value,
+                notas: document.getElementById('notas').value,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            products.push(product);
+            saveData();
+            showAlert('Producto agregado exitosamente');
+            this.reset();
+            updateAllViews();
+        });
+
+        // Actualizar todas las vistas
+        function updateAllViews() {
+            updateProductsList();
+            updateInventoryView();
+            updateStats();
+        }
+
+        // Actualizar lista de productos
+        function updateProductsList() {
+            const tbody = document.getElementById('productsTableBody');
+            
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No hay productos registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.codigo}</td>
+                    <td>${p.nombre}</td>
+                    <td>${p.categoria}</td>
+                    <td>${p.cantidad}</td>
+                    <td>${p.unidad}</td>
+                    <td>$${p.precio.toFixed(2)}</td>
+                    <td>$${p.precioVenta.toFixed(2)}</td>
+                    <td>${p.proveedor || '-'}</td>
+                    <td>${p.ubicacion || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-warning" onclick="editProduct('${p.codigo}')">✏️</button>
+                            <button class="btn-danger" onclick="deleteProduct('${p.codigo}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Actualizar vista de inventario
+        function updateInventoryView() {
+            const tbody = document.getElementById('inventoryTableBody');
+            
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">No hay productos en inventario</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = products.map(p => {
+                const stockStatus = p.cantidad <= p.minimo ? 'Bajo' : p.cantidad <= p.minimo * 2 ? 'Medio' : 'Normal';
+                const stockClass = p.cantidad <= p.minimo ? 'stock-low' : p.cantidad <= p.minimo * 2 ? 'stock-medium' : 'stock-high';
+                const valorTotal = p.cantidad * p.precio;
+
+                return `
+                    <tr>
+                        <td>${p.codigo}</td>
+                        <td>${p.nombre}</td>
+                        <td>${p.categoria}</td>
+                        <td class="${stockClass}">${p.cantidad} ${p.unidad}</td>
+                        <td>${p.minimo} ${p.unidad}</td>
+                        <td class="${stockClass}">${stockStatus}</td>
+                        <td>$${valorTotal.toFixed(2)}</td>
+                        <td>
+                            <button class="btn-success" onclick="quickAdjust('${p.codigo}', 'add')">+</button>
+                            <button class="btn-danger" onclick="quickAdjust('${p.codigo}', 'sub')">-</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            document.getElementById('totalProducts').textContent = products.length;
+            
+            const totalValue = products.reduce((sum, p) => sum + (p.cantidad * p.precio), 0);
+            document.getElementById('totalValue').textContent = '$' + totalValue.toFixed(2);
+            
+            const lowStock = products.filter(p => p.cantidad <= p.minimo).length;
+            document.getElementById('lowStock').textContent = lowStock;
+            
+            const categories = [...new Set(products.map(p => p.categoria))].length;
+            document.getElementById('totalCategories').textContent = categories;
+        }
+
+        // Actualizar productos en selector de movimientos
+        function updateMovProductos() {
+            const select = document.getElementById('movProducto');
+            select.innerHTML = '<option value="">Seleccionar producto...</option>' +
+                products.map(p => `<option value="${p.codigo}">${p.codigo} - ${p.nombre}</option>`).join('');
+        }
+
+        // Registrar movimiento
+        function registrarMovimiento() {
+            const codigo = document.getElementById('movProducto').value;
+            const tipo = document.getElementById('movTipo').value;
+            const cantidad = parseInt(document.getElementById('movCantidad').value);
+
+            if (!codigo || !cantidad) {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+
+            const product = products.find(p => p.codigo === codigo);
+            if (!product) return;
+
+            if (tipo === 'entrada') {
+                product.cantidad += cantidad;
+            } else {
+                if (product.cantidad < cantidad) {
+                    alert('No hay suficiente stock para esta salida');
+                    return;
+                }
+                product.cantidad -= cantidad;
+            }
+
+            saveData();
+            updateAllViews();
+            
+            document.getElementById('movCantidad').value = '';
+            showAlert(`Movimiento registrado: ${tipo === 'entrada' ? '+' : '-'}${cantidad} ${product.unidad}`);
+        }
+
+        // Ajuste rápido
+        function quickAdjust(codigo, action) {
+            const cantidad = prompt('Ingrese la cantidad:');
+            if (!cantidad || isNaN(cantidad)) return;
+
+            const product = products.find(p => p.codigo === codigo);
+            if (!product) return;
+
+            const qty = parseInt(cantidad);
+            if (action === 'add') {
+                product.cantidad += qty;
+            } else {
+                if (product.cantidad < qty) {
+                    alert('No hay suficiente stock');
+                    return;
+                }
+                product.cantidad -= qty;
+            }
+
+            saveData();
+            updateAllViews();
+        }
+
+        // Eliminar producto
+        function deleteProduct(codigo) {
+            if (!confirm('¿Está seguro de eliminar este producto?')) return;
+            
+            products = products.filter(p => p.codigo !== codigo);
+            saveData();
+            updateAllViews();
+            showAlert('Producto eliminado');
+        }
+
+        // Editar producto
+        function editProduct(codigo) {
+            const product = products.find(p => p.codigo === codigo);
+            if (!product) return;
+
+            document.getElementById('codigo').value = product.codigo;
+            document.getElementById('nombre').value = product.nombre;
+            document.getElementById('categoria').value = product.categoria;
+            document.getElementById('unidad').value = product.unidad;
+            document.getElementById('cantidad').value = product.cantidad;
+            document.getElementById('minimo').value = product.minimo;
+            document.getElementById('precio').value = product.precio;
+            document.getElementById('precioVenta').value = product.precioVenta;
+            document.getElementById('proveedor').value = product.proveedor;
+            document.getElementById('ubicacion').value = product.ubicacion;
+            document.getElementById('notas').value = product.notas;
+
+            deleteProduct(codigo);
+            showTab('agregar');
+            document.querySelector('.tab').click();
+        }
+
+        // Filtrar productos
+        function filterProducts() {
+            const search = document.getElementById('searchProducts').value.toLowerCase();
+            const rows = document.querySelectorAll('#productsTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Filtrar inventario
+        function filterInventory() {
+            const search = document.getElementById('searchInventory').value.toLowerCase();
+            const rows = document.querySelectorAll('#inventoryTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Exportar a Excel
+        function exportToExcel() {
+            const data = products.map(p => ({
+                'Código': p.codigo,
+                'Nombre': p.nombre,
+                'Categoría': p.categoria,
+                'Cantidad': p.cantidad,
+                'Unidad': p.unidad,
+                'Stock Mínimo': p.minimo,
+                'Precio Compra': p.precio,
+                'Precio Venta': p.precioVenta,
+                'Proveedor': p.proveedor,
+                'Ubicación': p.ubicacion,
+                'Valor Total': p.cantidad * p.precio,
+                'Notas': p.notas
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+            XLSX.writeFile(wb, 'Inventario_Ferreteria_' + new Date().toISOString().split('T')[0] + '.xlsx');
+        }
+
+        // Imprimir
+        function printList() {
+            window.print();
+        }
+
+        // Inicializar
+        loadData();
+    </script>
+</body>
+</html>
