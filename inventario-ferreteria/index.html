@@ -264,7 +264,6 @@
             <button class="tab" onclick="showTab('inventario')">📊 Control de Inventario</button>
         </div>
 
-        <!-- TAB 1: AGREGAR PRODUCTO -->
         <div id="agregar" class="content active">
             <h2 style="margin-bottom: 20px; color: #333;">Agregar Nuevo Producto</h2>
             <div id="alert-container"></div>
@@ -286,26 +285,25 @@
                         <select id="categoria" required>
                             <option value="">Seleccionar...</option>
                             <option value="Herramientas">Herramientas</option>
+                            <option value="Brocas y Discos">Brocas y Discos</option>
                             <option value="Electricidad">Electricidad</option>
                             <option value="Plomería">Plomería</option>
-                            <option value="Pintura">Pintura</option>
-                            <option value="Ferretería General">Ferretería General</option>
-                            <option value="Construcción">Construcción</option>
                             <option value="Jardinería">Jardinería</option>
                             <option value="Seguridad">Seguridad</option>
+                            <option value="Ferretería General">Ferretería General</option>
+                            <option value="Consumibles">Consumibles</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="unidad">Unidad de Medida *</label>
                         <select id="unidad" required>
                             <option value="">Seleccionar...</option>
-                            <option value="Pieza">Pieza</option>
-                            <option value="Caja">Caja</option>
-                            <option value="Paquete">Paquete</option>
-                            <option value="Metro">Metro</option>
-                            <option value="Kilo">Kilo</option>
-                            <option value="Litro">Litro</option>
-                            <option value="Galón">Galón</option>
+                            <option value="PZA">PZA</option>
+                            <option value="CAJA">CAJA</option>
+                            <option value="PAR">PAR</option>
+                            <option value="MTS">MTS</option>
+                            <option value="LT">LT</option>
+                            <option value="KIT">KIT</option>
                         </select>
                     </div>
                 </div>
@@ -334,7 +332,7 @@
 
                 <div class="form-group">
                     <label for="proveedor">Proveedor</label>
-                    <input type="text" id="proveedor" placeholder="Nombre del proveedor">
+                    <input type="text" id="proveedor" placeholder="Nombre del proveedor" value="TRUPER">
                 </div>
 
                 <div class="form-group">
@@ -351,7 +349,6 @@
             </form>
         </div>
 
-        <!-- TAB 2: LISTA DE PRODUCTOS -->
         <div id="lista" class="content">
             <h2 style="margin-bottom: 20px; color: #333;">Lista Completa de Productos</h2>
             
@@ -361,7 +358,7 @@
             </div>
 
             <div class="search-box">
-                <input type="text" id="searchProducts" placeholder="🔍 Buscar productos..." onkeyup="filterProducts()">
+                <input type="text" id="searchProducts" placeholder="🔍 Buscar productos por Código o Nombre..." oninput="filterProducts()">
             </div>
 
             <div class="table-container">
@@ -389,7 +386,6 @@
             </div>
         </div>
 
-        <!-- TAB 3: CONTROL DE INVENTARIO -->
         <div id="inventario" class="content">
             <h2 style="margin-bottom: 20px; color: #333;">Control de Inventario</h2>
 
@@ -438,7 +434,7 @@
             </div>
 
             <div class="search-box">
-                <input type="text" id="searchInventory" placeholder="🔍 Buscar en inventario..." onkeyup="filterInventory()">
+                <input type="text" id="searchInventory" placeholder="🔍 Buscar en inventario por Código..." oninput="filterInventory()">
             </div>
 
             <div class="table-container">
@@ -466,17 +462,64 @@
     </div>
 
     <script>
+        // Datos precargados de las facturas de Truper
+        const initialProducts = [
+            // Factura 117591010
+            { codigo: 'LT9-64', nombre: 'Pala cuadrada T-2000, puño "Y", Truper', categoria: 'Jardinería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 200.00, precioVenta: 280.00, proveedor: 'Truper', ubicacion: 'J-1', notas: '' },
+            { codigo: 'LTSY-6', nombre: 'Lima triángulo pesado 6", 34 dpp, con mango, PRETUL', categoria: 'Herramientas', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 50.00, precioVenta: 70.00, proveedor: 'Pretul', ubicacion: 'H-A2', notas: '' },
+            { codigo: 'GU-905N-M', nombre: 'Guantes de nylon recubiertos de nitrilo, M', categoria: 'Seguridad', unidad: 'PAR', cantidad: 50, minimo: 10, precio: 25.00, precioVenta: 35.00, proveedor: 'Truper', ubicacion: 'S-G3', notas: '' },
+            { codigo: 'MAN-1/12PM', nombre: 'Manguera de reuso 1/2", capa doble de PVC, 20 m, Pretul', categoria: 'Jardinería', unidad: 'MTS', cantidad: 50, minimo: 10, precio: 10.00, precioVenta: 15.00, proveedor: 'Pretul', ubicacion: 'J-2', notas: '' },
+            { codigo: 'EM-20N', nombre: 'Escoba metálica para jardín, curva, 20 dientes, mango 48"', categoria: 'Jardinería', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 150.00, precioVenta: 210.00, proveedor: 'Pretul', ubicacion: 'J-3', notas: '' },
+            { codigo: 'MOO-PRETUL', nombre: 'Cabeza de escoba jardín EM-20N Pretul', categoria: 'Jardinería', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 50.00, precioVenta: 70.00, proveedor: 'Pretul', ubicacion: 'J-3', notas: 'Solo la cabeza' },
+            { codigo: 'BRP-4', nombre: 'Brocha de 4" m/cinta 25 mm, c/display box con 12 pzas, PRETUL', categoria: 'Pintura', unidad: 'PZA', cantidad: 6, minimo: 3, precio: 20.00, precioVenta: 30.00, proveedor: 'Pretul', ubicacion: 'P-B1', notas: '' },
+            { codigo: 'AB-8', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #8, 1/2"-3/4"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: '' },
+            { codigo: 'AB-10', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #10, 3/4"-1 1/16"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 18.00, precioVenta: 28.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: '' },
+            { codigo: 'AB-12', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #12, 5/8"-1 1/4"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 22.00, precioVenta: 32.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: '' },
+            { codigo: 'CUG-WC', nombre: 'Pistola p/silicón para calafatear con guía para WC, 70 g, FOSET', categoria: 'Plomería', unidad: 'KIT', cantidad: 1, minimo: 0, precio: 50.00, precioVenta: 75.00, proveedor: 'Foset', ubicacion: 'PL-S1', notas: 'Para WC' },
+            { codigo: 'GU-124', nombre: 'Guantes de nylon recubiertos de nitrilo, XG, Truper', categoria: 'Seguridad', unidad: 'PAR', cantidad: 12, minimo: 3, precio: 30.00, precioVenta: 45.00, proveedor: 'Truper', ubicacion: 'S-G3', notas: '' },
+            { codigo: 'GU-912', nombre: 'Guante Anticorte NV5 recubrimiento de poliuretano, M, TRUPER', categoria: 'Seguridad', unidad: 'PAR', cantidad: 12, minimo: 3, precio: 120.00, precioVenta: 180.00, proveedor: 'Truper', ubicacion: 'S-G5', notas: '' },
+
+            // Factura 117412216
+            { codigo: 'LTR-6S', nombre: 'Lima triangular 6" para machete, 34 dpp, con mango, Truper', categoria: 'Herramientas', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 60.00, precioVenta: 90.00, proveedor: 'Truper', ubicacion: 'H-A3', notas: '' },
+            { codigo: 'BAV-3/32', nombre: 'Broca HSS 3/32" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 8.00, precioVenta: 15.00, proveedor: 'Truper Expert', ubicacion: 'B-M1', notas: '' },
+            { codigo: 'BAV-5/64', nombre: 'Broca HSS 5/64" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 7.50, precioVenta: 14.00, proveedor: 'Truper Expert', ubicacion: 'B-M1', notas: '' },
+            { codigo: 'BAV-1/4', nombre: 'Broca HSS 1/4" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Truper Expert', ubicacion: 'B-M2', notas: '' },
+            { codigo: 'BCT-3/8X6', nombre: 'Broca para concreto de 3/8 x 6", Truper', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 20.00, precioVenta: 35.00, proveedor: 'Truper', ubicacion: 'B-C1', notas: '' },
+            { codigo: 'BCT-1/4X6', nombre: 'Broca para concreto de 1/4 x 6", Truper', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 15.00, precioVenta: 25.00, proveedor: 'Truper', ubicacion: 'B-C1', notas: '' },
+            { codigo: 'LIAG-200', nombre: 'Lija de grano 120 de carburo de silicio, Truper', categoria: 'Consumibles', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 5.00, precioVenta: 8.00, proveedor: 'Truper', ubicacion: 'L-G1', notas: '' },
+            { codigo: 'WTU-235', nombre: 'Lubricante multiusos en aerosol, 235ml (8oz), Truper', categoria: 'Consumibles', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 70.00, precioVenta: 100.00, proveedor: 'Truper', ubicacion: 'Q-L1', notas: '' },
+            { codigo: 'HTU-72S', nombre: 'Hilo redondo, para desbrozadora, 2.7mm x 12m, tarjeta, TRUPER', categoria: 'Jardinería', unidad: 'PZA', cantidad: 6, minimo: 2, precio: 40.00, precioVenta: 60.00, proveedor: 'Truper', ubicacion: 'J-D1', notas: '' },
+            { codigo: 'H-60', nombre: 'Cepillo de alambre 6", 18 x 1.9 mm, rugoso, Pretul', categoria: 'Herramientas', unidad: 'PZA', cantidad: 48, minimo: 10, precio: 10.00, precioVenta: 15.00, proveedor: 'Pretul', ubicacion: 'H-C1', notas: '' },
+            { codigo: 'CEA-549', nombre: 'Cinta de alambre para pinzas, acero alto carbono, Pretul', categoria: 'Herramientas', unidad: 'PZA', cantidad: 15, minimo: 3, precio: 25.00, precioVenta: 40.00, proveedor: 'Pretul', ubicacion: 'H-C2', notas: '' },
+            { codigo: 'DLF-4018', nombre: 'Disco laminado 4-1/2", grano 40 centro 7/8", fibra, PRETUL', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Pretul', ubicacion: 'D-C1', notas: '' },
+            { codigo: 'DLF-4017', nombre: 'Disco laminado 4-1/2", grano 60 centro 7/8", fibra, PRETUL', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Pretul', ubicacion: 'D-C1', notas: '' },
+            { codigo: 'CFM-1/2P', nombre: 'Juego extractores 1/2" p/tornillos de latón, 6 piezas, Pretul', categoria: 'Herramientas', unidad: 'KIT', cantidad: 10, minimo: 3, precio: 40.00, precioVenta: 60.00, proveedor: 'Pretul', ubicacion: 'H-J1', notas: '' },
+            { codigo: 'DID-45SP', nombre: 'Disco de diamante de 4-1/2" x 1.2 mm rin segmentado, Pretul', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 60.00, precioVenta: 90.00, proveedor: 'Pretul', ubicacion: 'D-D1', notas: '' },
+            { codigo: 'COC-3G', nombre: 'Placa armada contacto duplex, 3 módulos, Toledo, BASIC', categoria: 'Electricidad', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 20.00, precioVenta: 30.00, proveedor: 'Volteck', ubicacion: 'E-T1', notas: '' },
+            { codigo: 'IT-115', nombre: 'Interruptor 1 polo 15A, enchufable, Volteck', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 30.00, precioVenta: 45.00, proveedor: 'Volteck', ubicacion: 'E-I1', notas: '' },
+            { codigo: 'CCS-3', nombre: 'Centro de carga de sobreponer, 2 polos, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 4, minimo: 1, precio: 100.00, precioVenta: 150.00, proveedor: 'Volteck', ubicacion: 'E-C1', notas: '' },
+            { codigo: 'IT-140', nombre: 'Interruptor de 1 polo 40A, enchufable, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 50.00, precioVenta: 75.00, proveedor: 'Volteck', ubicacion: 'E-I2', notas: '' },
+            { codigo: 'IT-150', nombre: 'Interruptor de 1 polo 50A, enchufable, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 60.00, precioVenta: 90.00, proveedor: 'Volteck', ubicacion: 'E-I2', notas: '' },
+            { codigo: 'FWC-60P', nombre: 'Manguera p/WC, aluminio, 1/2" x 7/8", 60 cm, BASIC', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 45.00, precioVenta: 65.00, proveedor: 'Foset', ubicacion: 'PL-M1', notas: '' },
+            { codigo: 'LLE-110Z', nombre: 'Llave de esfera, de zinc, 110 gr, entrada 1/2", FOSET BASIC', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 35.00, precioVenta: 50.00, proveedor: 'Foset', ubicacion: 'PL-L1', notas: '' },
+            { codigo: 'EMP-710S', nombre: 'Luminario empotrable con 1 spot dirigible, blanco, Volteck', categoria: 'Electricidad', unidad: 'PZA', cantidad: 4, minimo: 1, precio: 80.00, precioVenta: 120.00, proveedor: 'Volteck', ubicacion: 'E-L1', notas: '' },
+            { codigo: 'PPVC-50', nombre: 'Cemento p/PVC, transparente, baja presión, tubo 50ml, FOSET', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 25.00, precioVenta: 40.00, proveedor: 'Foset', ubicacion: 'PL-C1', notas: 'Baja presión' },
+            { codigo: 'PCPVC-50', nombre: 'Cemento p/PVC, amarillo, toda presión, tubo 50ml, FOSET', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 30.00, precioVenta: 45.00, proveedor: 'Foset', ubicacion: 'PL-C2', notas: 'Toda presión' }
+        ];
+
         let products = [];
         
-        // Cargar datos guardados
+        // Cargar datos guardados O los datos iniciales si es la primera vez
         function loadData() {
             const saved = window.localStorage ? localStorage.getItem('ferreteriaInventory') : null;
             if (saved) {
                 try {
                     products = JSON.parse(saved);
                 } catch(e) {
-                    products = [];
+                    products = initialProducts; // Cargar iniciales si hay error de parseo
                 }
+            } else {
+                products = initialProducts; // Cargar datos iniciales
             }
             updateAllViews();
         }
@@ -497,7 +540,15 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             
-            event.target.classList.add('active');
+            // Usar event.target solo si el evento existe
+            const target = event && event.target ? event.target : document.querySelector(`.tab[onclick="showTab('${tabName}')"]`);
+
+            if(target) {
+                target.classList.add('active');
+            } else {
+                 // Esto es un fallback en caso de llamada directa sin evento
+                document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+            }
             document.getElementById(tabName).classList.add('active');
             
             if (tabName === 'inventario') {
@@ -519,7 +570,7 @@
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const codigo = document.getElementById('codigo').value;
+            const codigo = document.getElementById('codigo').value.toUpperCase().trim();
             
             // Verificar si el código ya existe
             if (products.find(p => p.codigo === codigo)) {
@@ -529,16 +580,16 @@
 
             const product = {
                 codigo: codigo,
-                nombre: document.getElementById('nombre').value,
+                nombre: document.getElementById('nombre').value.trim(),
                 categoria: document.getElementById('categoria').value,
                 unidad: document.getElementById('unidad').value,
                 cantidad: parseInt(document.getElementById('cantidad').value),
                 minimo: parseInt(document.getElementById('minimo').value),
                 precio: parseFloat(document.getElementById('precio').value),
                 precioVenta: parseFloat(document.getElementById('precioVenta').value),
-                proveedor: document.getElementById('proveedor').value,
-                ubicacion: document.getElementById('ubicacion').value,
-                notas: document.getElementById('notas').value,
+                proveedor: document.getElementById('proveedor').value.trim(),
+                ubicacion: document.getElementById('ubicacion').value.trim(),
+                notas: document.getElementById('notas').value.trim(),
                 fechaRegistro: new Date().toISOString()
             };
 
@@ -546,6 +597,8 @@
             saveData();
             showAlert('Producto agregado exitosamente');
             this.reset();
+            // Restablecer proveedor por defecto
+            document.getElementById('proveedor').value = 'TRUPER';
             updateAllViews();
         });
 
@@ -565,25 +618,8 @@
                 return;
             }
 
-            tbody.innerHTML = products.map(p => `
-                <tr>
-                    <td>${p.codigo}</td>
-                    <td>${p.nombre}</td>
-                    <td>${p.categoria}</td>
-                    <td>${p.cantidad}</td>
-                    <td>${p.unidad}</td>
-                    <td>$${p.precio.toFixed(2)}</td>
-                    <td>$${p.precioVenta.toFixed(2)}</td>
-                    <td>${p.proveedor || '-'}</td>
-                    <td>${p.ubicacion || '-'}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-warning" onclick="editProduct('${p.codigo}')">✏️</button>
-                            <button class="btn-danger" onclick="deleteProduct('${p.codigo}')">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            // Usar el filtro actual para refrescar la lista
+            filterProducts(); 
         }
 
         // Actualizar vista de inventario
@@ -595,27 +631,8 @@
                 return;
             }
 
-            tbody.innerHTML = products.map(p => {
-                const stockStatus = p.cantidad <= p.minimo ? 'Bajo' : p.cantidad <= p.minimo * 2 ? 'Medio' : 'Normal';
-                const stockClass = p.cantidad <= p.minimo ? 'stock-low' : p.cantidad <= p.minimo * 2 ? 'stock-medium' : 'stock-high';
-                const valorTotal = p.cantidad * p.precio;
-
-                return `
-                    <tr>
-                        <td>${p.codigo}</td>
-                        <td>${p.nombre}</td>
-                        <td>${p.categoria}</td>
-                        <td class="${stockClass}">${p.cantidad} ${p.unidad}</td>
-                        <td>${p.minimo} ${p.unidad}</td>
-                        <td class="${stockClass}">${stockStatus}</td>
-                        <td>$${valorTotal.toFixed(2)}</td>
-                        <td>
-                            <button class="btn-success" onclick="quickAdjust('${p.codigo}', 'add')">+</button>
-                            <button class="btn-danger" onclick="quickAdjust('${p.codigo}', 'sub')">-</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            // Usar el filtro actual para refrescar la vista
+            filterInventory();
         }
 
         // Actualizar estadísticas
@@ -643,12 +660,19 @@
         function registrarMovimiento() {
             const codigo = document.getElementById('movProducto').value;
             const tipo = document.getElementById('movTipo').value;
-            const cantidad = parseInt(document.getElementById('movCantidad').value);
+            const cantidadInput = document.getElementById('movCantidad').value;
 
-            if (!codigo || !cantidad) {
-                alert('Por favor complete todos los campos');
+            if (!codigo || !cantidadInput) {
+                alert('Por favor seleccione un producto e ingrese una cantidad');
                 return;
             }
+            
+            const cantidad = parseInt(cantidadInput);
+            if (cantidad <= 0 || isNaN(cantidad)) {
+                 alert('La cantidad debe ser un número positivo');
+                 return;
+            }
+
 
             const product = products.find(p => p.codigo === codigo);
             if (!product) return;
@@ -657,7 +681,7 @@
                 product.cantidad += cantidad;
             } else {
                 if (product.cantidad < cantidad) {
-                    alert('No hay suficiente stock para esta salida');
+                    alert('No hay suficiente stock para esta salida. Cantidad actual: ' + product.cantidad);
                     return;
                 }
                 product.cantidad -= cantidad;
@@ -667,13 +691,13 @@
             updateAllViews();
             
             document.getElementById('movCantidad').value = '';
-            showAlert(`Movimiento registrado: ${tipo === 'entrada' ? '+' : '-'}${cantidad} ${product.unidad}`);
+            showAlert(`Movimiento registrado: ${tipo === 'entrada' ? '+' : '-'}${cantidad} ${product.unidad}`, tipo === 'entrada' ? 'success' : 'danger');
         }
 
-        // Ajuste rápido
+        // Ajuste rápido (manteniendo la funcionalidad)
         function quickAdjust(codigo, action) {
-            const cantidad = prompt('Ingrese la cantidad:');
-            if (!cantidad || isNaN(cantidad)) return;
+            const cantidad = prompt('Ingrese la cantidad para el ajuste:');
+            if (!cantidad || isNaN(cantidad) || parseInt(cantidad) <= 0) return;
 
             const product = products.find(p => p.codigo === codigo);
             if (!product) return;
@@ -681,12 +705,14 @@
             const qty = parseInt(cantidad);
             if (action === 'add') {
                 product.cantidad += qty;
+                showAlert(`Ajuste rápido: +${qty} ${product.unidad}`, 'success');
             } else {
                 if (product.cantidad < qty) {
-                    alert('No hay suficiente stock');
+                    alert('No hay suficiente stock para esta salida. Cantidad actual: ' + product.cantidad);
                     return;
                 }
                 product.cantidad -= qty;
+                showAlert(`Ajuste rápido: -${qty} ${product.unidad}`, 'danger');
             }
 
             saveData();
@@ -695,7 +721,7 @@
 
         // Eliminar producto
         function deleteProduct(codigo) {
-            if (!confirm('¿Está seguro de eliminar este producto?')) return;
+            if (!confirm('¿Está seguro de eliminar este producto? Esta acción es irreversible.')) return;
             
             products = products.filter(p => p.codigo !== codigo);
             saveData();
@@ -703,11 +729,12 @@
             showAlert('Producto eliminado');
         }
 
-        // Editar producto
+        // Editar producto (carga los datos al formulario de agregar)
         function editProduct(codigo) {
             const product = products.find(p => p.codigo === codigo);
             if (!product) return;
 
+            // Llenar el formulario con datos
             document.getElementById('codigo').value = product.codigo;
             document.getElementById('nombre').value = product.nombre;
             document.getElementById('categoria').value = product.categoria;
@@ -720,32 +747,107 @@
             document.getElementById('ubicacion').value = product.ubicacion;
             document.getElementById('notas').value = product.notas;
 
-            deleteProduct(codigo);
+            // Eliminar el producto de la lista (para que el botón de submit actúe como "Guardar")
+            // Se asume que el usuario dará clic en el botón '✓ Agregar Producto' (que ahora actúa como actualizar)
+            deleteProduct(codigo); 
+            
+            // Cambiar a la pestaña de agregar
             showTab('agregar');
-            document.querySelector('.tab').click();
+            document.querySelector('.tab').click(); // Asegura que la pestaña esté activa y el botón seleccionado
+            showAlert('Producto listo para editar. Presione "Agregar Producto" para guardar los cambios.', 'warning');
         }
 
-        // Filtrar productos
+        /**
+         * Lógica de Filtrado CLAVE para escaneo de códigos de barras
+         */
         function filterProducts() {
-            const search = document.getElementById('searchProducts').value.toLowerCase();
-            const rows = document.querySelectorAll('#productsTableBody tr');
+            const searchInput = document.getElementById('searchProducts');
+            const search = searchInput.value.toUpperCase().trim();
+            const tbody = document.getElementById('productsTableBody');
             
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(search) ? '' : 'none';
+            const filteredProducts = products.filter(p => {
+                // Si el término de búsqueda es largo, asumimos que es un escaneo de código
+                if (search.length > 3) {
+                    // Búsqueda exacta por código, útil para escáner
+                    if (p.codigo === search) return true; 
+                }
+                // Búsqueda parcial por código o nombre
+                return p.codigo.includes(search) || p.nombre.toUpperCase().includes(search);
             });
+
+            if (filteredProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #999;">No se encontraron productos</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredProducts.map(p => `
+                <tr>
+                    <td>${p.codigo}</td>
+                    <td>${p.nombre}</td>
+                    <td>${p.categoria}</td>
+                    <td>${p.cantidad}</td>
+                    <td>${p.unidad}</td>
+                    <td>$${p.precio.toFixed(2)}</td>
+                    <td>$${p.precioVenta.toFixed(2)}</td>
+                    <td>${p.proveedor || '-'}</td>
+                    <td>${p.ubicacion || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-warning" onclick="editProduct('${p.codigo}')">✏️</button>
+                            <button class="btn-danger" onclick="deleteProduct('${p.codigo}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+             // Mantiene el foco en la barra de búsqueda después de filtrar
+             searchInput.focus();
         }
 
-        // Filtrar inventario
+        // Filtrar inventario (similar al filtro de lista)
         function filterInventory() {
-            const search = document.getElementById('searchInventory').value.toLowerCase();
-            const rows = document.querySelectorAll('#inventoryTableBody tr');
+            const searchInput = document.getElementById('searchInventory');
+            const search = searchInput.value.toUpperCase().trim();
+            const tbody = document.getElementById('inventoryTableBody');
             
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(search) ? '' : 'none';
+            const filteredProducts = products.filter(p => {
+                 // Búsqueda exacta por código, priorizando escaneo
+                if (search.length > 3 && p.codigo === search) return true;
+                
+                // Búsqueda parcial por código o nombre
+                return p.codigo.includes(search) || p.nombre.toUpperCase().includes(search);
             });
+
+            if (filteredProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">No se encontraron productos en inventario</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredProducts.map(p => {
+                const stockStatus = p.cantidad <= p.minimo ? 'Bajo' : p.cantidad <= p.minimo * 2 ? 'Medio' : 'Normal';
+                const stockClass = p.cantidad <= p.minimo ? 'stock-low' : p.cantidad <= p.minimo * 2 ? 'stock-medium' : 'stock-high';
+                const valorTotal = p.cantidad * p.precio;
+
+                return `
+                    <tr>
+                        <td>${p.codigo}</td>
+                        <td>${p.nombre}</td>
+                        <td>${p.categoria}</td>
+                        <td class="${stockClass}">${p.cantidad} ${p.unidad}</td>
+                        <td>${p.minimo} ${p.unidad}</td>
+                        <td class="${stockClass}">${stockStatus}</td>
+                        <td>$${valorTotal.toFixed(2)}</td>
+                        <td>
+                            <button class="btn-success" onclick="quickAdjust('${p.codigo}', 'add')">+</button>
+                            <button class="btn-danger" onclick="quickAdjust('${p.codigo}', 'sub')">-</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+             // Mantiene el foco en la barra de búsqueda después de filtrar
+             searchInput.focus();
         }
+
 
         // Exportar a Excel
         function exportToExcel() {
@@ -760,7 +862,7 @@
                 'Precio Venta': p.precioVenta,
                 'Proveedor': p.proveedor,
                 'Ubicación': p.ubicacion,
-                'Valor Total': p.cantidad * p.precio,
+                'Valor Total Inventario': p.cantidad * p.precio,
                 'Notas': p.notas
             }));
 
