@@ -270,8 +270,8 @@
             <form id="productForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="codigo">Código del Producto *</label>
-                        <input type="text" id="codigo" required placeholder="Ej: FER-001">
+                        <label for="codigo">Código del Producto (Numérico/Escaneo) *</label>
+                        <input type="text" id="codigo" required placeholder="Ej: 25537">
                     </div>
                     <div class="form-group">
                         <label for="nombre">Nombre del Producto *</label>
@@ -358,7 +358,7 @@
             </div>
 
             <div class="search-box">
-                <input type="text" id="searchProducts" placeholder="🔍 Buscar productos por Código o Nombre..." oninput="filterProducts()">
+                <input type="text" id="searchProducts" placeholder="🔍 Buscar productos por Código (Escaneo) o Nombre..." oninput="filterProducts()">
             </div>
 
             <div class="table-container">
@@ -434,7 +434,7 @@
             </div>
 
             <div class="search-box">
-                <input type="text" id="searchInventory" placeholder="🔍 Buscar en inventario por Código..." oninput="filterInventory()">
+                <input type="text" id="searchInventory" placeholder="🔍 Buscar en inventario por Código (Escaneo)..." oninput="filterInventory()">
             </div>
 
             <div class="table-container">
@@ -462,49 +462,49 @@
     </div>
 
     <script>
-        // Datos precargados de las facturas de Truper
+        // Datos precargados de las facturas de Truper, usando la columna "Código" (numérica) como ID principal
         const initialProducts = [
             // Factura 117591010
-            { codigo: 'LT9-64', nombre: 'Pala cuadrada T-2000, puño "Y", Truper', categoria: 'Jardinería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 200.00, precioVenta: 280.00, proveedor: 'Truper', ubicacion: 'J-1', notas: '' },
-            { codigo: 'LTSY-6', nombre: 'Lima triángulo pesado 6", 34 dpp, con mango, PRETUL', categoria: 'Herramientas', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 50.00, precioVenta: 70.00, proveedor: 'Pretul', ubicacion: 'H-A2', notas: '' },
-            { codigo: 'GU-905N-M', nombre: 'Guantes de nylon recubiertos de nitrilo, M', categoria: 'Seguridad', unidad: 'PAR', cantidad: 50, minimo: 10, precio: 25.00, precioVenta: 35.00, proveedor: 'Truper', ubicacion: 'S-G3', notas: '' },
-            { codigo: 'MAN-1/12PM', nombre: 'Manguera de reuso 1/2", capa doble de PVC, 20 m, Pretul', categoria: 'Jardinería', unidad: 'MTS', cantidad: 50, minimo: 10, precio: 10.00, precioVenta: 15.00, proveedor: 'Pretul', ubicacion: 'J-2', notas: '' },
-            { codigo: 'EM-20N', nombre: 'Escoba metálica para jardín, curva, 20 dientes, mango 48"', categoria: 'Jardinería', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 150.00, precioVenta: 210.00, proveedor: 'Pretul', ubicacion: 'J-3', notas: '' },
-            { codigo: 'MOO-PRETUL', nombre: 'Cabeza de escoba jardín EM-20N Pretul', categoria: 'Jardinería', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 50.00, precioVenta: 70.00, proveedor: 'Pretul', ubicacion: 'J-3', notas: 'Solo la cabeza' },
-            { codigo: 'BRP-4', nombre: 'Brocha de 4" m/cinta 25 mm, c/display box con 12 pzas, PRETUL', categoria: 'Pintura', unidad: 'PZA', cantidad: 6, minimo: 3, precio: 20.00, precioVenta: 30.00, proveedor: 'Pretul', ubicacion: 'P-B1', notas: '' },
-            { codigo: 'AB-8', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #8, 1/2"-3/4"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: '' },
-            { codigo: 'AB-10', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #10, 3/4"-1 1/16"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 18.00, precioVenta: 28.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: '' },
-            { codigo: 'AB-12', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #12, 5/8"-1 1/4"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 22.00, precioVenta: 32.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: '' },
-            { codigo: 'CUG-WC', nombre: 'Pistola p/silicón para calafatear con guía para WC, 70 g, FOSET', categoria: 'Plomería', unidad: 'KIT', cantidad: 1, minimo: 0, precio: 50.00, precioVenta: 75.00, proveedor: 'Foset', ubicacion: 'PL-S1', notas: 'Para WC' },
-            { codigo: 'GU-124', nombre: 'Guantes de nylon recubiertos de nitrilo, XG, Truper', categoria: 'Seguridad', unidad: 'PAR', cantidad: 12, minimo: 3, precio: 30.00, precioVenta: 45.00, proveedor: 'Truper', ubicacion: 'S-G3', notas: '' },
-            { codigo: 'GU-912', nombre: 'Guante Anticorte NV5 recubrimiento de poliuretano, M, TRUPER', categoria: 'Seguridad', unidad: 'PAR', cantidad: 12, minimo: 3, precio: 120.00, precioVenta: 180.00, proveedor: 'Truper', ubicacion: 'S-G5', notas: '' },
+            { codigo: '25537', nombre: 'Pala cuadrada T-2000, puño "Y", Truper', categoria: 'Jardinería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 200.00, precioVenta: 280.00, proveedor: 'Truper', ubicacion: 'J-1', notas: 'Clave: LT9-64' },
+            { codigo: '22881', nombre: 'Lima triángulo pesado 6", 34 dpp, con mango, PRETUL', categoria: 'Herramientas', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 50.00, precioVenta: 70.00, proveedor: 'Pretul', ubicacion: 'H-A2', notas: 'Clave: LTSY-6' },
+            { codigo: '100657', nombre: 'Guantes de nylon recubiertos de nitrilo, M', categoria: 'Seguridad', unidad: 'PAR', cantidad: 50, minimo: 10, precio: 25.00, precioVenta: 35.00, proveedor: 'Truper', ubicacion: 'S-G3', notas: 'Clave: GU-905N-M' },
+            { codigo: '21516', nombre: 'Manguera de reuso 1/2", capa doble de PVC, 20 m, Pretul', categoria: 'Jardinería', unidad: 'MTS', cantidad: 50, minimo: 10, precio: 10.00, precioVenta: 15.00, proveedor: 'Pretul', ubicacion: 'J-2', notas: 'Clave: MAN-1/12PM' },
+            { codigo: '21501', nombre: 'Escoba metálica para jardín, curva, 20 dientes, mango 48"', categoria: 'Jardinería', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 150.00, precioVenta: 210.00, proveedor: 'Pretul', ubicacion: 'J-3', notas: 'Clave: EM-20N' },
+            { codigo: '21503', nombre: 'Cabeza de escoba jardín EM-20N Pretul', categoria: 'Jardinería', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 50.00, precioVenta: 70.00, proveedor: 'Pretul', ubicacion: 'J-3', notas: 'Clave: MOO-PRETUL' },
+            { codigo: '24320', nombre: 'Brocha de 4" m/cinta 25 mm, c/display box con 12 pzas, PRETUL', categoria: 'Pintura', unidad: 'PZA', cantidad: 6, minimo: 3, precio: 20.00, precioVenta: 30.00, proveedor: 'Pretul', ubicacion: 'P-B1', notas: 'Clave: BRP-4' },
+            { codigo: '47588', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #8, 1/2"-3/4"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: 'Clave: AB-8' },
+            { codigo: '47590', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #10, 3/4"-1 1/16"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 18.00, precioVenta: 28.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: 'Clave: AB-10' },
+            { codigo: '47591', nombre: 'Bolsa c/10 abrazaderas sin fin reforzadas #12, 5/8"-1 1/4"', categoria: 'Ferretería General', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 22.00, precioVenta: 32.00, proveedor: 'Fiero', ubicacion: 'F-A1', notas: 'Clave: AB-12' },
+            { codigo: '49704', nombre: 'Pistola p/silicón para calafatear con guía para WC, 70 g, FOSET', categoria: 'Plomería', unidad: 'KIT', cantidad: 1, minimo: 0, precio: 50.00, precioVenta: 75.00, proveedor: 'Foset', ubicacion: 'PL-S1', notas: 'Clave: CUG-WC' },
+            { codigo: '100645', nombre: 'Guantes de nylon recubiertos de nitrilo, XG, Truper', categoria: 'Seguridad', unidad: 'PAR', cantidad: 12, minimo: 3, precio: 30.00, precioVenta: 45.00, proveedor: 'Truper', ubicacion: 'S-G3', notas: 'Clave: GU-124' },
+            { codigo: '100679', nombre: 'Guante Anticorte NV5 recubrimiento de poliuretano, M, TRUPER', categoria: 'Seguridad', unidad: 'PAR', cantidad: 12, minimo: 3, precio: 120.00, precioVenta: 180.00, proveedor: 'Truper', ubicacion: 'S-G5', notas: 'Clave: GU-912' },
 
             // Factura 117412216
-            { codigo: 'LTR-6S', nombre: 'Lima triangular 6" para machete, 34 dpp, con mango, Truper', categoria: 'Herramientas', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 60.00, precioVenta: 90.00, proveedor: 'Truper', ubicacion: 'H-A3', notas: '' },
-            { codigo: 'BAV-3/32', nombre: 'Broca HSS 3/32" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 8.00, precioVenta: 15.00, proveedor: 'Truper Expert', ubicacion: 'B-M1', notas: '' },
-            { codigo: 'BAV-5/64', nombre: 'Broca HSS 5/64" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 7.50, precioVenta: 14.00, proveedor: 'Truper Expert', ubicacion: 'B-M1', notas: '' },
-            { codigo: 'BAV-1/4', nombre: 'Broca HSS 1/4" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Truper Expert', ubicacion: 'B-M2', notas: '' },
-            { codigo: 'BCT-3/8X6', nombre: 'Broca para concreto de 3/8 x 6", Truper', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 20.00, precioVenta: 35.00, proveedor: 'Truper', ubicacion: 'B-C1', notas: '' },
-            { codigo: 'BCT-1/4X6', nombre: 'Broca para concreto de 1/4 x 6", Truper', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 15.00, precioVenta: 25.00, proveedor: 'Truper', ubicacion: 'B-C1', notas: '' },
-            { codigo: 'LIAG-200', nombre: 'Lija de grano 120 de carburo de silicio, Truper', categoria: 'Consumibles', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 5.00, precioVenta: 8.00, proveedor: 'Truper', ubicacion: 'L-G1', notas: '' },
-            { codigo: 'WTU-235', nombre: 'Lubricante multiusos en aerosol, 235ml (8oz), Truper', categoria: 'Consumibles', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 70.00, precioVenta: 100.00, proveedor: 'Truper', ubicacion: 'Q-L1', notas: '' },
-            { codigo: 'HTU-72S', nombre: 'Hilo redondo, para desbrozadora, 2.7mm x 12m, tarjeta, TRUPER', categoria: 'Jardinería', unidad: 'PZA', cantidad: 6, minimo: 2, precio: 40.00, precioVenta: 60.00, proveedor: 'Truper', ubicacion: 'J-D1', notas: '' },
-            { codigo: 'H-60', nombre: 'Cepillo de alambre 6", 18 x 1.9 mm, rugoso, Pretul', categoria: 'Herramientas', unidad: 'PZA', cantidad: 48, minimo: 10, precio: 10.00, precioVenta: 15.00, proveedor: 'Pretul', ubicacion: 'H-C1', notas: '' },
-            { codigo: 'CEA-549', nombre: 'Cinta de alambre para pinzas, acero alto carbono, Pretul', categoria: 'Herramientas', unidad: 'PZA', cantidad: 15, minimo: 3, precio: 25.00, precioVenta: 40.00, proveedor: 'Pretul', ubicacion: 'H-C2', notas: '' },
-            { codigo: 'DLF-4018', nombre: 'Disco laminado 4-1/2", grano 40 centro 7/8", fibra, PRETUL', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Pretul', ubicacion: 'D-C1', notas: '' },
-            { codigo: 'DLF-4017', nombre: 'Disco laminado 4-1/2", grano 60 centro 7/8", fibra, PRETUL', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Pretul', ubicacion: 'D-C1', notas: '' },
-            { codigo: 'CFM-1/2P', nombre: 'Juego extractores 1/2" p/tornillos de latón, 6 piezas, Pretul', categoria: 'Herramientas', unidad: 'KIT', cantidad: 10, minimo: 3, precio: 40.00, precioVenta: 60.00, proveedor: 'Pretul', ubicacion: 'H-J1', notas: '' },
-            { codigo: 'DID-45SP', nombre: 'Disco de diamante de 4-1/2" x 1.2 mm rin segmentado, Pretul', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 60.00, precioVenta: 90.00, proveedor: 'Pretul', ubicacion: 'D-D1', notas: '' },
-            { codigo: 'COC-3G', nombre: 'Placa armada contacto duplex, 3 módulos, Toledo, BASIC', categoria: 'Electricidad', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 20.00, precioVenta: 30.00, proveedor: 'Volteck', ubicacion: 'E-T1', notas: '' },
-            { codigo: 'IT-115', nombre: 'Interruptor 1 polo 15A, enchufable, Volteck', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 30.00, precioVenta: 45.00, proveedor: 'Volteck', ubicacion: 'E-I1', notas: '' },
-            { codigo: 'CCS-3', nombre: 'Centro de carga de sobreponer, 2 polos, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 4, minimo: 1, precio: 100.00, precioVenta: 150.00, proveedor: 'Volteck', ubicacion: 'E-C1', notas: '' },
-            { codigo: 'IT-140', nombre: 'Interruptor de 1 polo 40A, enchufable, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 50.00, precioVenta: 75.00, proveedor: 'Volteck', ubicacion: 'E-I2', notas: '' },
-            { codigo: 'IT-150', nombre: 'Interruptor de 1 polo 50A, enchufable, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 60.00, precioVenta: 90.00, proveedor: 'Volteck', ubicacion: 'E-I2', notas: '' },
-            { codigo: 'FWC-60P', nombre: 'Manguera p/WC, aluminio, 1/2" x 7/8", 60 cm, BASIC', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 45.00, precioVenta: 65.00, proveedor: 'Foset', ubicacion: 'PL-M1', notas: '' },
-            { codigo: 'LLE-110Z', nombre: 'Llave de esfera, de zinc, 110 gr, entrada 1/2", FOSET BASIC', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 35.00, precioVenta: 50.00, proveedor: 'Foset', ubicacion: 'PL-L1', notas: '' },
-            { codigo: 'EMP-710S', nombre: 'Luminario empotrable con 1 spot dirigible, blanco, Volteck', categoria: 'Electricidad', unidad: 'PZA', cantidad: 4, minimo: 1, precio: 80.00, precioVenta: 120.00, proveedor: 'Volteck', ubicacion: 'E-L1', notas: '' },
-            { codigo: 'PPVC-50', nombre: 'Cemento p/PVC, transparente, baja presión, tubo 50ml, FOSET', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 25.00, precioVenta: 40.00, proveedor: 'Foset', ubicacion: 'PL-C1', notas: 'Baja presión' },
-            { codigo: 'PCPVC-50', nombre: 'Cemento p/PVC, amarillo, toda presión, tubo 50ml, FOSET', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 30.00, precioVenta: 45.00, proveedor: 'Foset', ubicacion: 'PL-C2', notas: 'Toda presión' }
+            { codigo: '11068', nombre: 'Lima triangular 6" para machete, 34 dpp, con mango, Truper', categoria: 'Herramientas', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 60.00, precioVenta: 90.00, proveedor: 'Truper', ubicacion: 'H-A3', notas: 'Clave: LTR-6S' },
+            { codigo: '100101', nombre: 'Broca HSS 3/32" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 8.00, precioVenta: 15.00, proveedor: 'Truper Expert', ubicacion: 'B-M1', notas: 'Clave: BAV-3/32' },
+            { codigo: '100100', nombre: 'Broca HSS 5/64" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 7.50, precioVenta: 14.00, proveedor: 'Truper Expert', ubicacion: 'B-M1', notas: 'Clave: BAV-5/64' },
+            { codigo: '100106', nombre: 'Broca HSS 1/4" Trugold para metal, Truper Expert', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 20, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Truper Expert', ubicacion: 'B-M2', notas: 'Clave: BAV-1/4' },
+            { codigo: '100130', nombre: 'Broca para concreto de 3/8 x 6", Truper', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 20.00, precioVenta: 35.00, proveedor: 'Truper', ubicacion: 'B-C1', notas: 'Clave: BCT-3/8X6' },
+            { codigo: '100128', nombre: 'Broca para concreto de 1/4 x 6", Truper', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 15.00, precioVenta: 25.00, proveedor: 'Truper', ubicacion: 'B-C1', notas: 'Clave: BCT-1/4X6' },
+            { codigo: '12822', nombre: 'Lija de grano 120 de carburo de silicio, Truper', categoria: 'Consumibles', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 5.00, precioVenta: 8.00, proveedor: 'Truper', ubicacion: 'L-G1', notas: 'Clave: LIAG-200' },
+            { codigo: '102706', nombre: 'Lubricante multiusos en aerosol, 235ml (8oz), Truper', categoria: 'Consumibles', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 70.00, precioVenta: 100.00, proveedor: 'Truper', ubicacion: 'Q-L1', notas: 'Clave: WTU-235' },
+            { codigo: '21568', nombre: 'Hilo redondo, para desbrozadora, 2.7mm x 12m, tarjeta, TRUPER', categoria: 'Jardinería', unidad: 'PZA', cantidad: 6, minimo: 2, precio: 40.00, precioVenta: 60.00, proveedor: 'Truper', ubicacion: 'J-D1', notas: 'Clave: HTU-72S' },
+            { codigo: '25610', nombre: 'Cepillo de alambre 6", 18 x 1.9 mm, rugoso, Pretul', categoria: 'Herramientas', unidad: 'PZA', cantidad: 48, minimo: 10, precio: 10.00, precioVenta: 15.00, proveedor: 'Pretul', ubicacion: 'H-C1', notas: 'Clave: H-60' },
+            { codigo: '22880', nombre: 'Cinta de alambre para pinzas, acero alto carbono, Pretul', categoria: 'Herramientas', unidad: 'PZA', cantidad: 15, minimo: 3, precio: 25.00, precioVenta: 40.00, proveedor: 'Pretul', ubicacion: 'H-C2', notas: 'Clave: CEA-549' },
+            { codigo: '22869', nombre: 'Disco laminado 4-1/2", grano 40 centro 7/8", fibra, PRETUL', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Pretul', ubicacion: 'D-C1', notas: 'Clave: DLF-4018' },
+            { codigo: '22870', nombre: 'Disco laminado 4-1/2", grano 60 centro 7/8", fibra, PRETUL', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 5, precio: 15.00, precioVenta: 25.00, proveedor: 'Pretul', ubicacion: 'D-C1', notas: 'Clave: DLF-4017' },
+            { codigo: '20235', nombre: 'Juego extractores 1/2" p/tornillos de latón, 6 piezas, Pretul', categoria: 'Herramientas', unidad: 'KIT', cantidad: 10, minimo: 3, precio: 40.00, precioVenta: 60.00, proveedor: 'Pretul', ubicacion: 'H-J1', notas: 'Clave: CFM-1/2P' },
+            { codigo: '22896', nombre: 'Disco de diamante de 4-1/2" x 1.2 mm rin segmentado, Pretul', categoria: 'Brocas y Discos', unidad: 'PZA', cantidad: 10, minimo: 3, precio: 60.00, precioVenta: 90.00, proveedor: 'Pretul', ubicacion: 'D-D1', notas: 'Clave: DID-45SP' },
+            { codigo: '47761', nombre: 'Placa armada contacto duplex, 3 módulos, Toledo, BASIC', categoria: 'Electricidad', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 20.00, precioVenta: 30.00, proveedor: 'Volteck', ubicacion: 'E-T1', notas: 'Clave: COC-3G' },
+            { codigo: '47055', nombre: 'Interruptor 1 polo 15A, enchufable, Volteck', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 30.00, precioVenta: 45.00, proveedor: 'Volteck', ubicacion: 'E-I1', notas: 'Clave: IT-115' },
+            { codigo: '47051', nombre: 'Centro de carga de sobreponer, 2 polos, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 4, minimo: 1, precio: 100.00, precioVenta: 150.00, proveedor: 'Volteck', ubicacion: 'E-C1', notas: 'Clave: CCS-3' },
+            { codigo: '47058', nombre: 'Interruptor de 1 polo 40A, enchufable, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 50.00, precioVenta: 75.00, proveedor: 'Volteck', ubicacion: 'E-I2', notas: 'Clave: IT-140' },
+            { codigo: '47059', nombre: 'Interruptor de 1 polo 50A, enchufable, VOLTECK', categoria: 'Electricidad', unidad: 'PZA', cantidad: 5, minimo: 2, precio: 60.00, precioVenta: 90.00, proveedor: 'Volteck', ubicacion: 'E-I2', notas: 'Clave: IT-150' },
+            { codigo: '49706', nombre: 'Manguera p/WC, aluminio, 1/2" x 7/8", 60 cm, BASIC', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 45.00, precioVenta: 65.00, proveedor: 'Foset', ubicacion: 'PL-M1', notas: 'Clave: FWC-60P' },
+            { codigo: '49712', nombre: 'Llave de esfera, de zinc, 110 gr, entrada 1/2", FOSET BASIC', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 35.00, precioVenta: 50.00, proveedor: 'Foset', ubicacion: 'PL-L1', notas: 'Clave: LLE-110Z' },
+            { codigo: '47020', nombre: 'Luminario empotrable con 1 spot dirigible, blanco, Volteck', categoria: 'Electricidad', unidad: 'PZA', cantidad: 4, minimo: 1, precio: 80.00, precioVenta: 120.00, proveedor: 'Volteck', ubicacion: 'E-L1', notas: 'Clave: EMP-710S' },
+            { codigo: '49709', nombre: 'Cemento p/PVC, transparente, baja presión, tubo 50ml, FOSET', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 25.00, precioVenta: 40.00, proveedor: 'Foset', ubicacion: 'PL-C1', notas: 'Clave: PPVC-50' },
+            { codigo: '49710', nombre: 'Cemento p/PVC, amarillo, toda presión, tubo 50ml, FOSET', categoria: 'Plomería', unidad: 'PZA', cantidad: 12, minimo: 3, precio: 30.00, precioVenta: 45.00, proveedor: 'Foset', ubicacion: 'PL-C2', notas: 'Clave: PCPVC-50' }
         ];
 
         let products = [];
@@ -540,13 +540,11 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             
-            // Usar event.target solo si el evento existe
             const target = event && event.target ? event.target : document.querySelector(`.tab[onclick="showTab('${tabName}')"]`);
 
             if(target) {
                 target.classList.add('active');
             } else {
-                 // Esto es un fallback en caso de llamada directa sin evento
                 document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
             }
             document.getElementById(tabName).classList.add('active');
@@ -618,7 +616,6 @@
                 return;
             }
 
-            // Usar el filtro actual para refrescar la lista
             filterProducts(); 
         }
 
@@ -631,7 +628,6 @@
                 return;
             }
 
-            // Usar el filtro actual para refrescar la vista
             filterInventory();
         }
 
@@ -748,17 +744,16 @@
             document.getElementById('notas').value = product.notas;
 
             // Eliminar el producto de la lista (para que el botón de submit actúe como "Guardar")
-            // Se asume que el usuario dará clic en el botón '✓ Agregar Producto' (que ahora actúa como actualizar)
             deleteProduct(codigo); 
             
             // Cambiar a la pestaña de agregar
             showTab('agregar');
-            document.querySelector('.tab').click(); // Asegura que la pestaña esté activa y el botón seleccionado
+            document.querySelector('.tab').click(); 
             showAlert('Producto listo para editar. Presione "Agregar Producto" para guardar los cambios.', 'warning');
         }
 
         /**
-         * Lógica de Filtrado CLAVE para escaneo de códigos de barras
+         * Lógica de Filtrado CLAVE para escaneo de códigos de barras (numéricos)
          */
         function filterProducts() {
             const searchInput = document.getElementById('searchProducts');
@@ -766,12 +761,10 @@
             const tbody = document.getElementById('productsTableBody');
             
             const filteredProducts = products.filter(p => {
-                // Si el término de búsqueda es largo, asumimos que es un escaneo de código
-                if (search.length > 3) {
-                    // Búsqueda exacta por código, útil para escáner
-                    if (p.codigo === search) return true; 
-                }
-                // Búsqueda parcial por código o nombre
+                // Prioridad 1: Búsqueda exacta por Código (ideal para escaneo de códigos numéricos)
+                if (search.length >= 5 && p.codigo === search) return true;
+                
+                // Prioridad 2: Búsqueda parcial por Nombre o inicio de Código
                 return p.codigo.includes(search) || p.nombre.toUpperCase().includes(search);
             });
 
@@ -800,7 +793,6 @@
                 </tr>
             `).join('');
 
-             // Mantiene el foco en la barra de búsqueda después de filtrar
              searchInput.focus();
         }
 
@@ -811,10 +803,10 @@
             const tbody = document.getElementById('inventoryTableBody');
             
             const filteredProducts = products.filter(p => {
-                 // Búsqueda exacta por código, priorizando escaneo
-                if (search.length > 3 && p.codigo === search) return true;
+                // Prioridad 1: Búsqueda exacta por Código (ideal para escaneo de códigos numéricos)
+                if (search.length >= 5 && p.codigo === search) return true;
                 
-                // Búsqueda parcial por código o nombre
+                // Prioridad 2: Búsqueda parcial por Nombre o inicio de Código
                 return p.codigo.includes(search) || p.nombre.toUpperCase().includes(search);
             });
 
@@ -844,7 +836,6 @@
                     </tr>
                 `;
             }).join('');
-             // Mantiene el foco en la barra de búsqueda después de filtrar
              searchInput.focus();
         }
 
@@ -852,7 +843,7 @@
         // Exportar a Excel
         function exportToExcel() {
             const data = products.map(p => ({
-                'Código': p.codigo,
+                'Código (Escaneo)': p.codigo,
                 'Nombre': p.nombre,
                 'Categoría': p.categoria,
                 'Cantidad': p.cantidad,
